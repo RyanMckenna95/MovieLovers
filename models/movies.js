@@ -6,4 +6,6 @@ const movies = [
     {id:100004, title:'The Terminator', released:'1984', cost:8.30, upVotes:660},
     {id:100005, title:'Baby Driver', released:'2017', cost:13.50, upVotes:1374},
 
-]
+];
+
+module.exports = movies;
