@@ -1,0 +1,9 @@
+const movies = [
+    {id:100000, title:'Avengers: End Game', released:'2019', cost:24.50, upVotes:1530},
+    {id:100001, title:'1917', released:'2019', cost:34.00, upVotes:43},
+    {id:100002, title:'Michael Collins', released:'1996', cost:10.00, upVotes:347},
+    {id:100003, title:'Blade Runner', released:'1986', cost:10.00, upVotes:4681},
+    {id:100004, title:'The Terminator', released:'1984', cost:8.30, upVotes:660},
+    {id:100005, title:'Baby Driver', released:'2017', cost:13.50, upVotes:1374},
+
+]
