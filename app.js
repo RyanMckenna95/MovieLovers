@@ -25,7 +25,11 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 app.get('/movie',movie.findAllMovies);
+app.get('/movie/:id',movie.findOneByID);
+
 app.get('/show',show.findAllShows);
+app.get('/show/:id',show.findOneByID);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
