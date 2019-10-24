@@ -1,5 +1,4 @@
 let movies = require('../models/movies');
-let shows = require('../models/shows');
 let express = require('express');
 let router = express.Router();
 
