@@ -27,17 +27,32 @@ router.findOneByID = (req, res) => {
         res.send('Review not found');
 }
 
+function getByName(array, title) {
+    var result  = array.filter(function(obj){return obj.title == title;} );
+    return result ? result[0] : null; // or undefined
+}
 
 router.addReview = (req, res) => {
     var id = Math.floor((Math.random()* 1000000) + 1);
     var currentSize = reviews.length;
+    var review = getByName(movies, req.body.reviewedTitle);
 
-    reviews.push({"id": id, "author" : req.body.author, "reviewedTitle" : req.body.reviewedTitle, "review": req.body.review, "rating": req.body.rating, "likes":0});
-
-    if((currentSize + 1) == reviews.length)
-        res.json({message: 'Review added'});
+    if(review != null) {
+        reviews.push({
+            "id": id,
+            "author": req.body.author,
+            "reviewedTitle": req.body.reviewedTitle,
+            "review": req.body.review,
+            "rating": req.body.rating,
+            "likes": 0
+        });
+        if ((currentSize + 1) == reviews.length)
+            res.json({message: 'Review added'});
+        else
+            res.json({message: 'Review not added'});
+    }
     else
-        res.json({message: 'Review not added'});
+        res.send('Review not found');
 }
 
 router.likeReview = (req, res) => {
