@@ -25,5 +25,44 @@ router.findOneByID = (req, res) => {
         res.send('Movie not found');
 }
 
+router.addMovie = (req, res) => {
+    var id = Math.floor((Math.random()* 1000000) + 1);
+    var currentSize = movies.length;
+
+    movies.push({"id": id, "title" : req.body.title, "released" : req.body.released, "cost": req.body.cost, "stock": req.body.stock});
+
+    if((currentSize + 1) == movies.length)
+        res.json({message: 'Movie added'});
+    else
+        res.json({message: 'Movie not added'});
+}
+
+router.purchaseMovie = (req, res) => {
+
+    var movie = getByValue(movies,req.params.id);
+    if ( movie!= null) {
+        movie.stock -= 1;
+        res.json({status : 200, message : 'Purchase Successful' , movie: movie });
+    }
+    else if(movie == 0){
+        res.send('This movie is out of stock')
+    }
+    else
+        res.send('Purchase was not Successful')
+}
+
+router.deleteMovie = (req, res) => {
+    //Delete the selected donation based on its id
+    var donation = getByValue(movies,req.params.id);
+    var index = movies.indexOf(movie);
+
+    var currentSize = movies.length;
+    movies.splice(index, 1);
+
+    if((currentSize - 1) == movies.length)
+        res.json({ message: 'Movie Deleted'});
+    else
+        res.json({ message: 'Unable to Delete this movie'});
+}
 
 module.exports=router;

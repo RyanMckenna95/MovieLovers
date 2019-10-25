@@ -8,6 +8,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const movie = require('./routes/movie');
 const  show = require('./routes/show');
+const review = require('./routes/review');
 
 var app = express();
 
@@ -26,9 +27,18 @@ app.use('/users', usersRouter);
 
 app.get('/movie',movie.findAllMovies);
 app.get('/movie/:id',movie.findOneByID);
+app.post('/movie', movie.addMovie);
+app.put('/movie/:id/purchase', movie.purchaseMovie);
+app.delete('/movie/:id',movie.deleteMovie);
 
 app.get('/show',show.findAllShows);
 app.get('/show/:id',show.findOneByID);
+
+app.get('/review',review.findAllReviews);
+app.get('/review/:id',review.findOneByID);
+app.post('/review',review.addReview);
+app.put('/review/:id/like',review.likeReview);
+app.delete('/review/:id',review.deleteReview);
 
 
 // catch 404 and forward to error handler
