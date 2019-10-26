@@ -10,6 +10,7 @@ router.findAllReviews =(req, res) =>{
     res.send(JSON.stringify(reviews,null,5));
 }
 
+
 function getByValue(array, id) {
     var result  = array.filter(function(obj){return obj.id == id;} );
     return result ? result[0] : null; // or undefined
@@ -55,6 +56,16 @@ router.addReview = (req, res) => {
         res.send('Review not found');
 }
 
+ /*router.editReview =(req, res , next) => {
+    review = findByIdAndUpdate({id:req.params.id},req.body).then(function(){
+       review.findOne({id:req/params.id}).then(function(review){
+           res.send(review);
+       });
+   });
+
+
+}
+*/
 router.likeReview = (req, res) => {
 
     var review = getByValue(reviews,req.params.id);

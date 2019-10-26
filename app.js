@@ -33,12 +33,16 @@ app.delete('/movie/:id',movie.deleteMovie);
 
 app.get('/show',show.findAllShows);
 app.get('/show/:id',show.findOneByID);
+app.post('/show', show.addShow);
+app.put('/show/:id/purchase', show.purchaseShow);
+app.delete('/movie/:id', show.deleteShow);
 
 app.get('/review',review.findAllReviews);
 app.get('/review/:id',review.findOneByID);
 app.post('/review',review.addReview);
 app.put('/review/:id/like',review.likeReview);
 app.delete('/review/:id',review.deleteReview);
+app.put('/review/:id',review.editReview);
 
 
 // catch 404 and forward to error handler
