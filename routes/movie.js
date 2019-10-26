@@ -1,11 +1,32 @@
 let movies = require('../models/movies');
 let express = require('express');
+let mongoose = require('mongoose');
 let router = express.Router();
+var Movie= require('../models/movies')
+
+mongoose.connect('mongodb://localhost:27017/movieLoverdbs');
+
+let db = mongoose.connection;
+
+db.on('error', function (err) {
+    console.log('Unable to Connect to [ ' + db.name + ' ]', err);
+});
+
+db.once('open', function () {
+    console.log('Successfully Connected to [ ' + db.name + ' ]');
+});
 
 router.findAllMovies =(req, res) =>{
 
     res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(movies,null,5));
+
+    Movie.find(function (err, movies) {
+        if(err)
+            res.send(err);
+
+        res.send(JSON.stringify(movies,null,5));
+    })
+
 }
 
 function getByValue(array, id) {
@@ -17,52 +38,72 @@ router.findOneByID = (req, res) => {
 
     res.setHeader('Content-type','application/json');
 
-    var movie = getByValue(movies, req.params.id);
-
-    if(movie != null)
-        res.send(JSON.stringify(movie,null,5));
-    else
-        res.send('Movie not found');
+    Movie.find({"_id":req.params.id},function (err, movie) {
+        if(err)
+        res.json({message: 'Movie not found', errmsg:err});
+        else
+            res.send(JSON.stringify(movie,null,5));
+    });
 }
 
 router.addMovie = (req, res) => {
-    var id = Math.floor((Math.random()* 1000000) + 1);
-    var currentSize = movies.length;
 
-    movies.push({"id": id, "title" : req.body.title, "released" : req.body.released, "cost": req.body.cost, "stock": req.body.stock});
+    res.setHeader('Content-type','application/json');
 
-    if((currentSize + 1) == movies.length)
-        res.json({message: 'Movie added'});
-    else
-        res.json({message: 'Movie not added'});
+    var movie = new Movie;
+
+    movie.title=req.body.title;
+    movie.released=req.body.released;
+    movie.cost=req.body.cost;
+    movie.stock=req.body.stock;
+
+    movie.save(function (err) {
+        if(err)
+            res.json({message: 'Movie not added', errmsg:err});
+
+        else
+        res.json({message: 'Movie added', data:movie});
+    });
+
 }
 
 router.purchaseMovie = (req, res) => {
 
-    var movie = getByValue(movies,req.params.id);
-    if ( movie!= null) {
-        movie.stock -= 1;
-        res.json({status : 200, message : 'Purchase Successful' , movie: movie });
-    }
-    else if(movie == 0){
-        res.send('This movie is out of stock')
-    }
-    else
-        res.send('Purchase was not Successful')
+
+    Movie.findById(req.params.id,function (err,movie) {
+        if(err)
+            res.json({message:'Movie not found',errmsg:err});
+        else{
+            movie.stock -=1;
+            if(movie.stock == 0){
+                res.send('this Movie is out of stock')
+            }else
+            movie.save(function (err){
+
+                if(err)
+                    res.json({message:'unable to add to checkout', errmsg});
+                else
+                    res.json({message:'added to basket',data:movie});
+            });
+        }
+    });
 }
 
 router.deleteMovie = (req, res) => {
-    //Delete the selected donation based on its id
-    var donation = getByValue(movies,req.params.id);
-    var index = movies.indexOf(movie);
+    Movie.findById(req.body.id, req.body.stock).then(function(){
+        if(Movie.stock == 0){
+            Movie.findByIdAndRemove(req.params.id, function (err) {
+                if(err)
+                    res.json({message:'Movie not deleted',errmsg:err});
+                else
+                    res.json({message:'movie deleted Successfully'})
+            })
+        }else
+            res.send('must be out of stock to delete');
+    });
 
-    var currentSize = movies.length;
-    movies.splice(index, 1);
 
-    if((currentSize - 1) == movies.length)
-        res.json({ message: 'Movie Deleted'});
-    else
-        res.json({ message: 'Unable to Delete this movie'});
-}
+
+};
 
 module.exports=router;

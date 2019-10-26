@@ -1,4 +1,18 @@
-const shows = [
+let mongoose=require('mongoose');
+
+let ShowSchema=new mongoose.Schema({
+        title: String,
+        season: Number,
+        released: String,
+        cost: Number,
+        stock: Number
+    },
+    {collection:'Shows'});
+
+module.exports=mongoose.model('Shows', ShowSchema);
+
+
+/*const shows = [
     {id:200001, title:'House', season:'1', released:'2004', cost:24.50, stock:1530},
     {id:200002, title:'House', season:'2', released:'2005', cost:21.00, stock:1900},
     {id:200003, title:'House', season:'3', released:'2006', cost:17.50, stock:1290},
@@ -15,4 +29,4 @@ const shows = [
 
 ];
 
-module.exports = shows;
+module.exports = shows;*/

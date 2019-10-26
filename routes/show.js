@@ -1,13 +1,24 @@
 let shows = require('../models/shows');
 let express = require('express');
 let router = express.Router();
+let mongoose = require('mongoose');
+var Show = require('../models/shows')
+
+mongoose.connect('mongodb://localhost:27017/movieLoverdbs');
 
 
-router.findAllShows =(req, res) =>{
+router.findAllShows =(req, res) => {
 
     res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(shows,null,5));
+
+    Show.find(function (err, shows) {
+        if (err)
+            res.send(err);
+
+        res.send(JSON.stringify(shows, null, 5));
+    })
 }
+
 
 function getByValue(array, id) {
     var result  = array.filter(function(obj){return obj.id == id;} );
@@ -18,12 +29,12 @@ router.findOneByID = (req, res) => {
 
     res.setHeader('Content-type','application/json');
 
-    var show = getByValue(shows, req.params.id);
-
-    if(show != null)
-        res.send(JSON.stringify(show,null,5));
-    else
-        res.send('Show not found');
+    Show.find({"_id":req.params.id},function (err, show) {
+        if(err)
+            res.json({message: 'show not found', errmsg:err});
+        else
+            res.send(JSON.stringify(show,null,5));
+    });
 }
 
 router.addShow = (req, res) => {

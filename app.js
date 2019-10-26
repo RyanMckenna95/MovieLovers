@@ -42,7 +42,7 @@ app.get('/review/:id',review.findOneByID);
 app.post('/review',review.addReview);
 app.put('/review/:id/like',review.likeReview);
 app.delete('/review/:id',review.deleteReview);
-app.put('/review/:id',review.editReview);
+//app.put('/review/:id',review.editReview);
 
 
 // catch 404 and forward to error handler

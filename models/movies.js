@@ -1,4 +1,18 @@
-const movies = [
+let mongoose=require('mongoose');
+
+let MovieSchema=new mongoose.Schema({
+    title: String,
+    released: String,
+    cost: Number,
+    stock: Number
+},
+    {collection:'movies'});
+
+module.exports=mongoose.model('Movie', MovieSchema);
+
+
+
+/*const movies = [
     {id:100000, title:'Avengers: End Game', released:'2019', cost:24.50, stock:1530},
     {id:100001, title:'1917', released:'2019', cost:34.00, stock:43},
     {id:100002, title:'Michael Collins', released:'1996', cost:10.00, stock:347},
@@ -8,4 +22,4 @@ const movies = [
 
 ];
 
-module.exports = movies;
+module.exports = movies;*/

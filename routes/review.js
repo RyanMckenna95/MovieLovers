@@ -2,12 +2,22 @@ let reviews = require('../models/reviews');
 let movies =require('../models/movies');
 let shows =require('../models/shows');
 let express = require('express');
+let mongoose = require('mongoose');
 let router = express.Router();
+var Review = require('../models/reviews')
 
-router.findAllReviews =(req, res) =>{
+mongoose.connect('mongodb://localhost:27017/movieLoverdbs');
+
+router.findAllReviews =(req, res) => {
 
     res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(reviews,null,5));
+
+    Review.find(function (err, reviews) {
+        if (err)
+            res.send(err);
+
+        res.send(JSON.stringify(reviews, null, 5));
+    })
 }
 
 
@@ -20,12 +30,12 @@ router.findOneByID = (req, res) => {
 
     res.setHeader('Content-type','application/json');
 
-    var movie = getByValue(reviews, req.params.id);
-
-    if(movie != null)
-        res.send(JSON.stringify(movie,null,5));
-    else
-        res.send('Review not found');
+    Review.find({"_id":req.params.id},function (err, review) {
+        if(err)
+            res.json({message: 'Movie not found', errmsg:err});
+        else
+            res.send(JSON.stringify(review,null,5));
+    });
 }
 
 function getByName(array, title) {
