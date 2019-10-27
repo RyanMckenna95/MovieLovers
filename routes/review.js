@@ -1,12 +1,13 @@
-let reviews = require('../models/reviews');
-let movies =require('../models/movies');
-let shows =require('../models/shows');
+
 let express = require('express');
 let mongoose = require('mongoose');
 let router = express.Router();
 var Review = require('../models/reviews')
+var Movie =require('../models/movies')
 
-mongoose.connect('mongodb://localhost:27017/movieLoverdbs');
+var mongodbUri = 'mongodb+srv://moviedb:movielover123@movielovers-lm3w3.mongodb.net/test?retryWrites=true&w=majority'
+//mongoose.connect('mongodb://localhost:27017/movieLoverdbs');
+mongoose.connect(mongodbUri);
 
 router.findAllReviews =(req, res) => {
 
@@ -43,62 +44,80 @@ function getByName(array, title) {
     return result ? result[0] : null; // or undefined
 }
 
-router.addReview = (req, res) => {
-    var id = Math.floor((Math.random()* 1000000) + 1);
-    var currentSize = reviews.length;
-    var review = getByName(movies, req.body.reviewedTitle);
+router.addReviewMovie = (req, res) => {
+    res.setHeader('Content-type','application/json');
 
-    if(review != null) {
-        reviews.push({
-            "id": id,
-            "author": req.body.author,
-            "reviewedTitle": req.body.reviewedTitle,
-            "review": req.body.review,
-            "rating": req.body.rating,
-            "likes": 0
-        });
-        if ((currentSize + 1) == reviews.length)
-            res.json({message: 'Review added'});
+    Movie.findOne({'_id': req.params.id}, function (err) {
+        if(err)
+            res.json({message: 'movie not found'})
         else
-            res.json({message: 'Review not added'});
-    }
-    else
-        res.send('Review not found');
+            var review = new Review
+
+            review.author= req.body.author;
+            review.titleID= req.params.id;
+            review.reviewedTitle= req.body.reviewedTitle;
+            review.review= req.body.review;
+            review.rating= req.body.rating;
+        review.save(function (err) {
+            if(err)
+                res.json({message:'review not added',errmsg:err});
+            else
+                res.json({message:'review added successfully',data:review});
+        });
+    });
+
 }
 
- /*router.editReview =(req, res , next) => {
-    review = findByIdAndUpdate({id:req.params.id},req.body).then(function(){
-       review.findOne({id:req/params.id}).then(function(review){
-           res.send(review);
-       });
-   });
+router.findByAuthor = (req, res)=>{
+    res.setHeader('Content-type','application/json');
+
+    Review.find({"author":req.params.author},function (err, review) {
+        if(err)
+            res.json({message: 'Movie not found', errmsg:err});
+        else
+            res.send(JSON.stringify(review,null,5));
+    });
+
+}
+
+ router.editReview =(req, res) => {
+    Review.findByIdAndUpdate({_id:req.params.id},req.body).then(function(){
+        Review.findOne({_id:req.params.id}).then(function(review){
+            res.send(review);
+        });
+    });
 
 
 }
-*/
+
 router.likeReview = (req, res) => {
+    Review.findById(req.params.id, function (err, review) {
+        if (err)
+            res.json({message: 'Review not found', errmsg: err});
+        else {
+            review.likes += 1;
+            review.save(function (err) {
+                if (err)
+                    res.json({message: 'Error liking', errmsg: err});
+                else
+                    res.json({message: 'Review liked'});
 
-    var review = getByValue(reviews,req.params.id);
-    if ( review!= null) {
-        review.likes += 1;
-        res.json({status : 200, message : 'Purchase Successful' , review: review });
-    }
-    else
-        res.send('error liking')
+            });
+        }
+
+    });
 }
 
 router.deleteReview = (req, res) => {
-    //Delete the selected donation based on its id
-    var review = getByValue(reviews,req.params.id);
-    var index = reviews.indexOf(review);
 
-    var currentSize = reviews.length;
-    reviews.splice(index, 1);
+    Review.findByIdAndRemove(req.params.id,function (err) {
+        if(err)
+            res.json({message:'Review not deleted',errmsg:err});
+        else
+            res.json({message:'Review has been deleted'});
 
-    if((currentSize - 1) == reviews.length)
-        res.json({ message: 'Review Deleted'});
-    else
-        res.json({ message: 'Unable to Delete this movie review'});
+    });
+
 }
 
 module.exports=router;

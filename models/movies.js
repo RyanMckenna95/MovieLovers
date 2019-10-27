@@ -1,10 +1,22 @@
 let mongoose=require('mongoose');
 
 let MovieSchema=new mongoose.Schema({
-    title: String,
-    released: String,
-    cost: Number,
-    stock: Number
+    title: {
+        type:String,
+        required:true
+    },
+    released:{
+        type:String,
+        required:true
+    },
+    cost: {
+        type:Number,
+        required:true
+    },
+    stock: {
+        type:Number,
+        required:true
+    }
 },
     {collection:'movies'});
 

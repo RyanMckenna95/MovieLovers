@@ -4,8 +4,9 @@ let router = express.Router();
 let mongoose = require('mongoose');
 var Show = require('../models/shows')
 
-mongoose.connect('mongodb://localhost:27017/movieLoverdbs');
-
+var mongodbUri = 'mongodb+srv://moviedb:movielover123@movielovers-lm3w3.mongodb.net/test?retryWrites=true&w=majority'
+//mongoose.connect('mongodb://localhost:27017/movieLoverdbs');
+mongoose.connect(mongodbUri);
 
 router.findAllShows =(req, res) => {
 
@@ -38,43 +39,59 @@ router.findOneByID = (req, res) => {
 }
 
 router.addShow = (req, res) => {
-    var id = Math.floor((Math.random()* 1000000) + 1);
-    var currentSize = shows.length;
+    res.setHeader('Content-type','application/json');
 
-    shows.push({"id": id, "title" : req.body.title, "season" : req.body.season , "released" : req.body.released, "cost": req.body.cost, "stock": req.body.stock});
+    var show = new Show;
 
-    if((currentSize + 1) == shows.length)
-        res.json({message: 'Show added'});
-    else
-        res.json({message: 'Show not added'});
+    show.title=req.body.title;
+    show.season=req.body.season;
+    show.released=req.body.released;
+    show.cost=req.body.cost;
+    show.stock=req.body.stock;
+
+    show.save(function (err) {
+        if(err)
+            res.json({message:'show not added',errmsg:err});
+        else
+            res.json({message:'show added successfully',data:show});
+    });
+
 }
 
 router.purchaseShow = (req, res) => {
 
-    var show = getByValue(shows,req.params.id);
-    if ( show!= null) {
-        show.stock -= 1;
-        res.json({status : 200, message : 'Purchase Successful' , show: show });
-    }
-    else if(show == 0){
-        res.send('This show is out of stock')
-    }
-    else
-        res.send('Purchase was not Successful')
+    Show.findById(req.params.id,function (err,show) {
+        if(err)
+            res.json({message:'Show not found',errmsg:err});
+        else
+            if (show.stock == 0){
+                res.send('This show is out of stock')
+            }else
+                show.stock -=1;
+                show.save(function (err){
+
+                    if(err)
+                        res.json({message:'unable to add to checkout', errmsg});
+                    else
+                        res.json({message:'added to basket',data:show});
+                });
+
+    });
+
 }
 
 router.deleteShow = (req, res) => {
-    //Delete the selected donation based on its id
-    var donation = getByValue(shows,req.params.id);
-    var index = shows.indexOf(show);
-
-    var currentSize = shows.length;
-    shows.splice(index, 1);
-
-    if((currentSize - 1) == shows.length)
-        res.json({ message: 'Show Deleted'});
-    else
-        res.json({ message: 'Unable to Delete this show'});
+    Show.findById(req.params.id).then(function(){
+        if(req.params.stock == 0){
+            Show.findByIdAndRemove(req.params.id, function (err) {
+                if(err)
+                    res.json({message:'Show not deleted',errmsg:err});
+                else
+                    res.json({message:'Show deleted Successfully'})
+            })
+        }else
+            res.send('must be out of stock to delete');
+    });
 }
 
 module.exports=router;

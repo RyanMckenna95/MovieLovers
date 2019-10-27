@@ -4,7 +4,10 @@ let mongoose = require('mongoose');
 let router = express.Router();
 var Movie= require('../models/movies')
 
-mongoose.connect('mongodb://localhost:27017/movieLoverdbs');
+var mongodbUri = 'mongodb+srv://moviedb:movielover123@movielovers-lm3w3.mongodb.net/test?retryWrites=true&w=majority'
+
+//mongoose.connect('mongodb://localhost:27017/movieLoverdbs');
+mongoose.connect(mongodbUri);
 
 let db = mongoose.connection;
 
@@ -73,25 +76,25 @@ router.purchaseMovie = (req, res) => {
     Movie.findById(req.params.id,function (err,movie) {
         if(err)
             res.json({message:'Movie not found',errmsg:err});
-        else{
-            movie.stock -=1;
+        else
             if(movie.stock == 0){
                 res.send('this Movie is out of stock')
             }else
-            movie.save(function (err){
+                movie.stock -=1;
+                movie.save(function (err){
 
                 if(err)
                     res.json({message:'unable to add to checkout', errmsg});
                 else
                     res.json({message:'added to basket',data:movie});
             });
-        }
+
     });
 }
 
 router.deleteMovie = (req, res) => {
-    Movie.findById(req.body.id, req.body.stock).then(function(){
-        if(Movie.stock == 0){
+    Movie.findById(req.params.id).then(function(){
+        if(req.params.stock == 0){
             Movie.findByIdAndRemove(req.params.id, function (err) {
                 if(err)
                     res.json({message:'Movie not deleted',errmsg:err});

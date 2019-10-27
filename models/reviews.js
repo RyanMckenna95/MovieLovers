@@ -1,10 +1,23 @@
 let mongoose=require('mongoose');
 
 let ReviewSchema=new mongoose.Schema({
-        author: String,
-        reviewedTitle: String,
-        review: String,
-        rating: Number,
+        author: {
+            type:String,
+            required:true
+        },
+        titleID: {
+            type:String,
+            required:true
+        },
+        reviewedTitle: {
+            type:String,
+            required:true
+        },
+        review: {
+            type:String,
+            required:true
+        },
+        rating: {type:Number, min:0 , max:10, required:true},
         likes: {type:Number,default:0}
     },
     {collection:'reviews'});

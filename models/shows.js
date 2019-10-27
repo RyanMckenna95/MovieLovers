@@ -1,11 +1,26 @@
 let mongoose=require('mongoose');
 
 let ShowSchema=new mongoose.Schema({
-        title: String,
-        season: Number,
-        released: String,
-        cost: Number,
-        stock: Number
+        title: {
+            type:String,
+            required:true
+        },
+        season: {
+            type:Number,
+            required:true
+        },
+        released: {
+            type:String,
+            required:true
+        },
+        cost: {
+            type:Number,
+            required:true
+        },
+        stock: {
+            type:Number,
+            required:true
+        }
     },
     {collection:'Shows'});
 
